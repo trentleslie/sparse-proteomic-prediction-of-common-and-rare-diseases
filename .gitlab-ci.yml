@@ -15,8 +15,9 @@ sync_gitlab_to_github:
   before_script:
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    # Use the secure token to authenticate GitHub operations
-    - 'git remote set-url github https://$GITHUB_TOKEN@github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git'
+    # Add the GitHub remote, replacing it if it exists
+    - git remote remove github || true  # Remove if it exists, ignore errors if it does not
+    - git remote add github https://$GITHUB_TOKEN@github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
   script:
     - python --version
     - git fetch origin || exit 1
@@ -26,3 +27,4 @@ sync_gitlab_to_github:
     - git push github main --tags || exit 1
   only:
     - main
+
