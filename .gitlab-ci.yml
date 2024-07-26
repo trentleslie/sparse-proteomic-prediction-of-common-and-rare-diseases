@@ -1,3 +1,12 @@
+stages:
+  - sync
+
+variables:
+  GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org
+  GITHUB_USER_EMAIL: trentleslie@gmail.com
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 1
+
 sync_gitlab_to_github:
   stage: sync
   image: python:3.10
@@ -6,7 +15,7 @@ sync_gitlab_to_github:
   before_script:
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    # Use the token to set up the GitHub remote URL securely
+    # Use the secure token to authenticate GitHub operations
     - 'git remote set-url github https://$GITHUB_TOKEN@github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git'
   script:
     - python --version
