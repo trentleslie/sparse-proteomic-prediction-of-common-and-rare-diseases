@@ -15,16 +15,15 @@ sync_gitlab_to_github:
   before_script:
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    # Add the GitHub remote, replacing it if it exists
-    - git remote remove github || true  # Remove if it exists, ignore errors if it does not
+    - git remote remove github || true  # Ensures no conflicts with existing remotes
     - git remote add github https://$GITHUB_TOKEN@github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
   script:
     - python --version
     - git fetch origin || exit 1
     - git checkout main || exit 1
     - git merge origin/main || exit 1
-    - git push github main || exit 1
-    - git push github main --tags || exit 1
+    - git push github main || exit 1  # Push the changes to GitHub
+    - git push github main --tags || exit 1  # Push the tags to GitHub
   only:
     - main
 
