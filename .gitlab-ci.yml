@@ -1,0 +1,37 @@
+stages:
+  - sync
+
+variables:
+  GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org  # Your GitLab email
+  GITHUB_USER_EMAIL: your_github_email@example.com  # Your GitHub email used for commits
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 1
+
+sync_gitlab_to_github:
+  stage: sync
+  image: python:3.10  # Using Python 3.10 Docker image
+  tags:
+    - docker  # Ensure your runner is tagged with 'docker' if it's specific
+  before_script:
+    - apt-get update && apt-get install -y openssh-client git
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -  # Add the SSH private key from GitLab variables
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+    - git config --global user.email "$GITHUB_USER_EMAIL"
+    - git config --global user.name "Trent Leslie"
+    - git config --global pull.rebase true  # Set pull to rebase by default for a linear history
+    - git remote remove github || true  # Remove if it exists to avoid conflicts
+    - git remote add github git@github.com:trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
+  script:
+    - python --version
+    - git fetch origin || exit 1
+    - git checkout main || exit 1
+    - git merge origin/main || exit 1
+    - echo "Pulling changes from GitHub to avoid conflicts..."
+    - git pull --rebase github main || exit 1  # Rebase local changes on top of GitHub changes
+    - echo "Attempting to push to GitHub:"
+    - git push github main || exit 1  # Push the changes to the main branch on GitHub
+  only:
+    - main
