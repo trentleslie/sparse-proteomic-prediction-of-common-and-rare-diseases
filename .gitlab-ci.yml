@@ -9,18 +9,18 @@ variables:
 
 sync_gitlab_to_github:
   stage: sync
-  image: python:3.10  # Ensures that Python 3.10 is used
+  image: python:3.10
   tags:
-    - docker  # Specifies that this job should be run by a runner with the 'docker' tag
+    - docker
   script:
-    - python --version  # Confirm the Python version
+    - python --version  # Check Python version to confirm correct environment
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    - git remote add github https://github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
-    - git fetch gitlab || exit 1
-    - git checkout main || exit 1
-    - git merge gitlab/main || exit 1
-    - git push github main || exit 1
-    - git push github main --tags || exit 1
+    - git remote add github https://github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git || true  # Avoid errors if the remote already exists
+    - git fetch origin || exit 1  # Fetch updates from GitLab
+    - git checkout main || exit 1  # Ensure you're on the main branch
+    - git merge origin/main || exit 1  # Merge any changes from the GitLab repository
+    - git push github main || exit 1  # Push updates to GitHub
+    - git push github main --tags || exit 1  # Push tags if there are any
   only:
     - main
