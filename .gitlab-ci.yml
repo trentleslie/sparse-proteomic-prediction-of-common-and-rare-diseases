@@ -2,36 +2,35 @@ stages:
   - sync
 
 variables:
-  GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org  # Your GitLab email
-  GITHUB_USER_EMAIL: your_github_email@example.com  # Your GitHub email used for commits
+  GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org
+  GITHUB_USER_EMAIL: your_github_email@example.com
   GIT_STRATEGY: clone
   GIT_DEPTH: 1
 
 sync_gitlab_to_github:
   stage: sync
-  image: python:3.10  # Using Python 3.10 Docker image
+  image: python:3.10
   tags:
-    - docker  # Ensure your runner is tagged with 'docker' if it's specific
+    - docker
   before_script:
-    # Set up SSH key and SSH known hosts
     - apt-get update && apt-get install -y openssh-client git
     - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -  # Add the SSH private key from GitLab variables
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    - git remote remove github || true  # Remove if it exists to avoid conflict
+    - git remote remove github || true
     - git remote add github git@github.com:trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
   script:
-    # Script to fetch, merge and push changes
     - python --version
     - git fetch origin || exit 1
     - git checkout main || exit 1
     - git merge origin/main || exit 1
+    - echo "Pulling changes from GitHub to avoid conflicts..."
+    - git pull github main || exit 1  # Ensure local is up-to-date
     - echo "Attempting to push to GitHub:"
-    - git push github main || exit 1  # Push the changes to the main branch on GitHub
-    - git push github main --tags || exit 1  # Also push tags if there are any
+    - git push github main || exit 1
   only:
-    - main  # Only execute this job for the main branch
+    - main
