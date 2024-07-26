@@ -9,7 +9,9 @@ variables:
 
 sync_gitlab_to_github:
   stage: sync
+  image: python:3.10  # Ensures that Python 3.10 is used
   script:
+    - python --version  # Confirm the Python version
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
     - git remote add github https://github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
