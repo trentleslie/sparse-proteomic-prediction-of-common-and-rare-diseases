@@ -1,0 +1,18 @@
+stages:
+  - sync
+
+variables:
+  GIT_STRATEGY: clone
+
+sync_gitlab_to_github:
+  stage: sync
+  script:
+    - git config --global user.email "trentleslie@gmail.com"
+    - git config --global user.name "Trent Leslie"
+    - git remote add github https://github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
+    - git fetch gitlab
+    - git checkout main
+    - git merge gitlab/main
+    - git push github main
+  only:
+    - main
