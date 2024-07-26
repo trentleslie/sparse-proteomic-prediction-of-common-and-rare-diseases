@@ -17,13 +17,16 @@ sync_gitlab_to_github:
     - git config --global user.name "Trent Leslie"
     - git remote remove github || true  # Ensures no conflicts with existing remotes
     - git remote add github https://$GITHUB_TOKEN@github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
+    # Debugging: output the remote URLs to verify the format
+    - echo "Remote URLs after setup:"
+    - git remote -v
   script:
     - python --version
     - git fetch origin || exit 1
     - git checkout main || exit 1
     - git merge origin/main || exit 1
+    - echo "Attempting to push to GitHub:"
     - git push github main || exit 1  # Push the changes to GitHub
     - git push github main --tags || exit 1  # Push the tags to GitHub
   only:
     - main
-
