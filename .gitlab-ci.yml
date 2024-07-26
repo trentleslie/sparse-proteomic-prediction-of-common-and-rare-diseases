@@ -1,26 +1,19 @@
-stages:
-  - sync
-
-variables:
-  GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org
-  GITHUB_USER_EMAIL: trentleslie@gmail.com
-  GIT_STRATEGY: clone
-  GIT_DEPTH: 1
-
 sync_gitlab_to_github:
   stage: sync
   image: python:3.10
   tags:
     - docker
-  script:
-    - python --version  # Check Python version to confirm correct environment
+  before_script:
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    - git remote add github https://github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git || true  # Avoid errors if the remote already exists
-    - git fetch origin || exit 1  # Fetch updates from GitLab
-    - git checkout main || exit 1  # Ensure you're on the main branch
-    - git merge origin/main || exit 1  # Merge any changes from the GitLab repository
-    - git push github main || exit 1  # Push updates to GitHub
-    - git push github main --tags || exit 1  # Push tags if there are any
+    # Use the token to set up the GitHub remote URL securely
+    - 'git remote set-url github https://$GITHUB_TOKEN@github.com/trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git'
+  script:
+    - python --version
+    - git fetch origin || exit 1
+    - git checkout main || exit 1
+    - git merge origin/main || exit 1
+    - git push github main || exit 1
+    - git push github main --tags || exit 1
   only:
     - main
