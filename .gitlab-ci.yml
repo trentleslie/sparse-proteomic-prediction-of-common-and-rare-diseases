@@ -3,7 +3,7 @@ stages:
 
 variables:
   GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org  # Your GitLab email
-  GITHUB_USER_EMAIL: your_github_email@example.com  # Your GitHub email used for commits
+  GITHUB_USER_EMAIL: trentleslie@gmail.com  # Your GitHub email used for commits
   GIT_STRATEGY: clone
   GIT_DEPTH: 1
 
