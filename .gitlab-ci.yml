@@ -5,7 +5,7 @@ variables:
   GITLAB_USER_EMAIL: trent.leslie@phenomehealth.org  # Your GitLab email
   GITHUB_USER_EMAIL: trentleslie@gmail.com  # Your GitHub email used for commits
   GIT_STRATEGY: clone
-  GIT_DEPTH: 1
+  GIT_DEPTH: 0
 
 sync_gitlab_to_github:
   stage: sync
@@ -16,22 +16,28 @@ sync_gitlab_to_github:
     - apt-get update && apt-get install -y openssh-client git
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -  # Add the SSH private key from GitLab variables
+    - apt-get update && apt-get install -y openssh-client git
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
     - git config --global user.email "$GITHUB_USER_EMAIL"
     - git config --global user.name "Trent Leslie"
-    - git config --global pull.rebase true  # Set pull to rebase by default for a linear history
-    - git remote remove github || true  # Remove if it exists to avoid conflicts
+    - git remote remove github || true
     - git remote add github git@github.com:trentleslie/sparse-proteomic-prediction-of-common-and-rare-diseases.git
   script:
     - python --version
-    - git fetch origin || exit 1
-    - git checkout main || exit 1
-    - git merge origin/main || exit 1
-    - echo "Pulling changes from GitHub to avoid conflicts..."
-    - git pull --rebase github main || exit 1  # Rebase local changes on top of GitHub changes
-    - echo "Attempting to push to GitHub:"
-    - git push github main || exit 1  # Push the changes to the main branch on GitHub
+    - git fetch --all --prune
+    - git checkout -B temp_branch origin/main
+    - |
+      if git push -f github temp_branch:main; then
+        echo "Successfully pushed to GitHub main branch."
+      else
+        echo "Failed to push to GitHub. There might be an issue with permissions or network."
+        exit 1
+      fi
+    - git checkout -B main origin/main  # This line ensures you checkout the remote main branch explicitly
+    - git branch -D temp_branch
   only:
     - main
